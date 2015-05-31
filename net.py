@@ -5,7 +5,10 @@ from scipy.special import expit
 
 class NN(object):
 
-    def __init__(self, layers):
+    def __init__(self, layers, seed=None):
+
+        if seed:
+            np.random.seed(seed)
 
         self.weight = [np.random.random((ins, outs)) for ins, outs in zip(layers[:-1], layers[1:])]
         self.bias = [np.random.random((1,cols)) for cols in layers[1:]]
