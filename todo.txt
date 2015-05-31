@@ -1,0 +1,5 @@
+- genome to network
+- net.NN enabled flag for each link
+- neat mutator
+- neat crossover
+- network to graph (for visualization)?

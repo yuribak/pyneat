@@ -4,6 +4,7 @@ from operator import itemgetter
 import random
 import string
 from itertools import starmap
+from crossover import n_point_crossover
 
 class Evo(object):
     def __init__(self, generator, pop_size, fitness, crossover, mutator):
@@ -44,11 +45,6 @@ def fitness(s):
     target = 'the grey fox wooopty'
     return sum(x == y for x, y in zip(s, target))/float(len(target))
 
-def crossover(f,m):
-    r = random.randint(0, len(f))
-    c = f[:r]+m[r:]
-    return c
-
 def mutator(s):
     r = random.randint(0,len(s)-1)
     temp = s[0]
@@ -57,7 +53,7 @@ def mutator(s):
     return s
 
 if __name__ == '__main__':
-    evo = Evo(random_string, 2000, fitness, crossover, mutator)
+    evo = Evo(random_string, 2000, fitness, n_point_crossover(1), mutator)
 
     gens = 1000
     g = gens

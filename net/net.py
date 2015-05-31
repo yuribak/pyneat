@@ -15,6 +15,7 @@ class NN(object):
         self.layers = layers
 
     def activate(self, ins):
+        assert len(ins) == self.layers[0]
 
         outs = self.sigmoid(np.array(ins[:]).reshape((1, self.layers[0])))
         for w, b in zip(self.weight, self.bias):
