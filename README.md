@@ -1,2 +1,5 @@
 # pyneat
-a pure python implementation of NEAT method for evolving neural networks
+a python neuro-evolution library inspired by NEAT:
+http://en.wikipedia.org/wiki/Neuroevolution_of_augmenting_topologies
+
+work in progress - very early stages!
