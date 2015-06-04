@@ -6,9 +6,9 @@ import random
 
 from scipy.special import expit
 
+from commons import WEIGHT, BIAS
 
-WEIGHT = 'weight'
-BIAS = 'bias'
+
 
 
 class MatrixNN(object):

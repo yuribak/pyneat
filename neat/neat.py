@@ -1,7 +1,9 @@
 __author__ = 'yurib'
 
 import random
+import networkx as nx
 from itertools import product
+from commons import WEIGHT, BIAS
 
 class Link(object):
 
@@ -104,6 +106,9 @@ class Genome(object):
         self.delete_link(s,t)
         self.add_link(s,new_node,hmarker)
         self.add_link(new_node,t,hmarker)
+
+    def to_digraph(self):
+        pass
 
     def __repr__(self):
         return 'nodes:%s\nlayers:%s\nlinks: (%d)\n%s' % (self.layers,map(len,self.layers), len(self.links), '\n'.join(str(l) for l in self.links.values()))
