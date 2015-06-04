@@ -108,7 +108,13 @@ class Genome(object):
         self.add_link(new_node,t,hmarker)
 
     def to_digraph(self):
-        pass
+
+        g = nx.DiGraph()
+
+        for link in self.links.values():
+            g.add_edge(link.in_node,link.out_node, weight=link.weight)
+
+        return g,self.layers[0],self.layers[-1]
 
     def __repr__(self):
         return 'nodes:%s\nlayers:%s\nlinks: (%d)\n%s' % (self.layers,map(len,self.layers), len(self.links), '\n'.join(str(l) for l in self.links.values()))
@@ -118,8 +124,5 @@ class Genome(object):
 if __name__ == '__main__':
 
     g = Genome([2,3,2], link_prob=0)
-    print g
-    g.add_random_link(1)
-    print g
-    g.add_random_node(2)
-    print g
+    f,ins,outs = g.to_digraph()
+    print type(f),ins,outs,f.edges()
