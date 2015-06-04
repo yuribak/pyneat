@@ -8,9 +8,6 @@ from scipy.special import expit
 
 from commons import WEIGHT, BIAS
 
-
-
-
 class MatrixNN(object):
 
     def __init__(self, layers, seed=None, zeros=False):
@@ -52,8 +49,9 @@ class Neuron(object):
             return
         vs = [s.output for s,_ in ins]
         ws = [self.graph[s][t][WEIGHT] for s,t in ins]
-        bs = [self.graph[s][t][BIAS] for s,t in ins]
-
+        #bs = [self.graph[s][t][BIAS] for s,t in ins]
+        # todo: fix - bias is a node property!
+        bs = [0]*len(ins)
         self.output = self.activation(sum(v*w+b for v,w,b in zip(vs,ws,bs)))
         return self.output
 

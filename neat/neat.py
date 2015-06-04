@@ -39,6 +39,13 @@ class Node(object):
 
 class Genome(object):
 
+    HMARKER = 0
+
+    @staticmethod
+    def hmarker():
+        Genome.HMARKER += 1
+        return Genome.HMARKER
+
     def __init__(self, layers, link_prob=0.0):
 
         # split nodes to layers
@@ -55,15 +62,15 @@ class Genome(object):
 
                 # at least one link to the next layer to ensure connectivity
                 t = random.sample(self.layers[i+1], 1)[0]
-                self.add_link(node, t, 0)
+                self.add_link(node, t)
 
                 # links to nodes from higher layers with probability link_prob
                 for t in higher_nodes:
                     if random.random() < link_prob:
-                        self.add_link(node, t, 0)
+                        self.add_link(node, t)
 
-    def add_link(self,s,t,h):
-        self.links[(s,t)] = Link(s,t,h)
+    def add_link(self,s,t):
+        self.links[(s,t)] = Link(s,t,Genome.hmarker())
 
     def add_random_link(self, hmarker):
         while True:
@@ -119,10 +126,15 @@ class Genome(object):
     def __repr__(self):
         return 'nodes:%s\nlayers:%s\nlinks: (%d)\n%s' % (self.layers,map(len,self.layers), len(self.links), '\n'.join(str(l) for l in self.links.values()))
 
+def crossover(f,m):
+    pass
+
+
 
 
 if __name__ == '__main__':
 
     g = Genome([2,3,2], link_prob=0)
+    print g
     f,ins,outs = g.to_digraph()
     print type(f),ins,outs,f.edges()
