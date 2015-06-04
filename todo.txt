@@ -1,4 +1,15 @@
-- genome to network
+- neat
+    - mutations
+        - new link
+            - only between adjacent layers ?
+            - from lower layer to higher layer
+            - no closing cycles
+        - new node
+            - maintain layers
+            - from existing link
+
+
+
 - net.NN enabled flag for each link
 - neat mutator
 - neat crossover

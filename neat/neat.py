@@ -1,7 +1,7 @@
 __author__ = 'yurib'
+
 import random
 from itertools import product
-from net.net import NN
 
 class Link(object):
 
@@ -13,7 +13,7 @@ class Link(object):
         self.enabled = enabled
 
     def __repr__(self):
-        return 'in:%d, out:%d, hmarker:%d, weight:%.2f, enabled:%s' % (self.in_node,self.out_node,self.hmarker,self.weight,self.enabled)
+        return '(%d,%d), hmarker:%d, weight:%.2f, enabled:%s' % (self.in_node,self.out_node,self.hmarker,self.weight,self.enabled)
 
     @staticmethod
     def random_links(layers, link_prob=1.0):
@@ -30,33 +30,91 @@ class Link(object):
 
         return links
 
+class Node(object):
+    def __init__(self, id, hmarker):
+        self.id = id
+        self.hmarker = hmarker
+
 class Genome(object):
-    def __init__(self, layers, links=None):
-        self.layers = layers
-        self.links = links or Link.random_links(layers)
 
-    def to_nn(self):
-        net = NN(self.layers)
-        for link in self.links:
-            # TODO: set enabled flag for the link
-            (in_layer, in_node), (out_layer, out_node) = map(self._node_id_abs_to_layer_coords,
-                                                             [link.in_node, link.out_node])
-            net.weight[in_layer][in_node][out_node] = link.weight if link.enabled else 0
-        return net
+    def __init__(self, layers, link_prob=0.0):
 
-    def _node_id_abs_to_layer_coords(self, n):
-        for i,l in enumerate(self.layers):
-            if sum(self.layers[:i+1]) > n:
-                return i, n - sum(self.layers[:i])
-        raise ValueError('node id outside of range')
+        # split nodes to layers
+        agg_layers = [sum(layers[:i]) for i in range(len(layers)+1)]
+        self.layers = [range(agg_layers[i-1], agg_layers[i]) for i in range(1, len(agg_layers))]
+        self.nodes = {}
+
+        self.links = {}
+        # generate links
+        for i, layer in enumerate(self.layers[:-1]):
+
+            higher_nodes = sum(self.layers[i+1:], [])
+            for node in layer:
+
+                # at least one link to the next layer to ensure connectivity
+                t = random.sample(self.layers[i+1], 1)[0]
+                self.add_link(node, t, 0)
+
+                # links to nodes from higher layers with probability link_prob
+                for t in higher_nodes:
+                    if random.random() < link_prob:
+                        self.add_link(node, t, 0)
+
+    def add_link(self,s,t,h):
+        self.links[(s,t)] = Link(s,t,h)
+
+    def add_random_link(self, hmarker):
+        while True:
+            sl = random.sample(range(len(self.layers)-1), 1)[0]
+            s = random.sample(self.layers[sl], 1)[0]
+            t = random.sample(sum(self.layers[sl+1:],[]), 1)[0]
+            if (s, t) not in self.links:
+                break
+        self.add_link(s,t,hmarker)
+
+    def delete_link(self, s, t):
+        del self.links[(s,t)]
+
+    def layer_idx_by_node(self,node_id):
+        for i, layer in enumerate(self.layers):
+            if node_id in layer:
+                return i
+        raise ValueError('Unknown node id!')
+
+    def add_random_node(self,hmarker):
+
+        # choose link to split
+        link = random.sample(self.links.values(), 1)[0]
+
+        # choose layer for new node
+        s, t = link.in_node, link.out_node
+        s_layer, t_layer = map(self.layer_idx_by_node,[s,t])
+
+        if t_layer - s_layer == 1:
+            self.layers.insert(t_layer,[])
+            new_node_layer = t_layer
+        else:
+            new_node_layer = s_layer + 1
+
+        # add new node
+        new_node = max(sum(self.layers,[])) + 1
+        self.layers[new_node_layer].append(new_node)
+
+        # delete old link and add new ones
+        self.delete_link(s,t)
+        self.add_link(s,new_node,hmarker)
+        self.add_link(new_node,t,hmarker)
 
     def __repr__(self):
-        return 'layers:%s\nlinks:%s' % (self.layers, self.links)
+        return 'nodes:%s\nlayers:%s\nlinks: (%d)\n%s' % (self.layers,map(len,self.layers), len(self.links), '\n'.join(str(l) for l in self.links.values()))
+
 
 
 if __name__ == '__main__':
 
-    g = Genome([2,3,2])
+    g = Genome([2,3,2], link_prob=0)
     print g
-    net = g.to_nn()
-    print net
+    g.add_random_link(1)
+    print g
+    g.add_random_node(2)
+    print g
